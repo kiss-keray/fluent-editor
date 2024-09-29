@@ -2,7 +2,7 @@ import Tooltip from 'quill/ui/tooltip'
 import type Quill from 'quill'
 import { Delta } from 'quill/core'
 import Emitter from 'quill/core/emitter'
-import { MathfieldElement } from 'mathlive'
+import type { MathfieldElement } from 'mathlive'
 import type { Bounds } from 'quill/core/selection'
 export default class MathliveTooltip extends Tooltip {
   static TEMPLATE = ``

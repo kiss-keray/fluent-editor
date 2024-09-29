@@ -1,7 +1,7 @@
 import { EmbedBlot } from 'parchment'
 import type { Root } from 'parchment'
 import Quill from 'quill'
-import { MathfieldElement } from 'mathlive'
+import type { MathfieldElement } from 'mathlive'
 type MathliveBlotMode = 'dialog' | 'only-read'
 export default class MathliveBlot extends EmbedBlot {
   static blotName = 'mathlive'

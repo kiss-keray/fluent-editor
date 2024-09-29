@@ -1,6 +1,6 @@
 import { EmbedBlot } from 'parchment'
 import type { Root } from 'parchment'
-import type Quill from 'quill'
+import Quill from 'quill'
 import { MathfieldElement } from 'mathlive'
 type MathliveBlotMode = 'dialog' | 'only-read'
 export default class MathliveBlot extends EmbedBlot {
@@ -22,8 +22,9 @@ export default class MathliveBlot extends EmbedBlot {
     const el = super.create() as MathfieldElement
     el.setAttribute('mode', obj.mode)
     el.classList.add('view')
+    el.innerHTML = obj.value
     el.setValue(obj.value)
-    return el
+    return el as MathfieldElement
   }
 
   static value(domNode: MathfieldElement) {
@@ -42,33 +43,31 @@ export default class MathliveBlot extends EmbedBlot {
     if (this.initFlag) return
     if (this.mode === 'only-read') return
     this.initFlag = true
-    const dom = this.domNode as HTMLElement
+    const dom = this.domNode as MathfieldElement
     this.quill = this.findQuillInstance()!
     if (this.mode === 'dialog') {
       dom.addEventListener('click', () => {
         // @ts-ignore
-        this.quill!.getModule('mathlive').createDialog(dom.value)
+        this.quill.getModule('mathlive').createDialog(dom.value)
       })
     }
   }
 
   html() {
-    const { formula } = this.value()
-    return `<math-field class="ql-math-field view"  contenteditable="false" mode="${this.mode}">${formula}</math-field>`
+    const formula = (this.domNode as MathfieldElement).value
+    return `<math-field class="ql-math-field view" contenteditable="false" mode="${this.mode}">${formula}</math-field>`
   }
 
-  findQuillInstance(): Quill | null {
-    let dom = this.domNode as HTMLElement
-    for (let i = 0; i < 100; i++) {
-      const p = dom.parentElement
-      if (!p) return null
-      // @ts-ignore
-      if (p.quill) {
-        // @ts-ignore
-        return p.quill
+  findQuillInstance(): Quill {
+    if (this.quill) return this.quill
+    let dom = (this.domNode as HTMLElement).parentElement
+    while (dom) {
+      const quill = (dom as any).quill
+      if (quill instanceof Quill) {
+        return quill
       }
-      dom = p
+      dom = dom.parentElement
     }
-    return null
+    throw new Error('not found quill instance')
   }
 }

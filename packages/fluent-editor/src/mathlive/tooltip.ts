@@ -7,7 +7,7 @@ import type { Bounds } from 'quill/core/selection'
 export default class MathliveTooltip extends Tooltip {
   static TEMPLATE = ``
 
-  mathliveDom: MathfieldElement | null
+  mathliveDom: MathfieldElement
   editValue?: string
 
   constructor(quill: Quill, boundsContainer?: HTMLElement) {
@@ -24,7 +24,7 @@ export default class MathliveTooltip extends Tooltip {
       this.hide()
     })
     this.root.addEventListener('keydown', (event) => {
-      if (event.code === 'Enter') {
+      if (event.key === 'Enter') {
         event.preventDefault()
         this.save()
       }
@@ -44,8 +44,9 @@ export default class MathliveTooltip extends Tooltip {
     this.editValue = value
     this.root.classList.remove('ql-hidden')
     this.root.classList.add('ql-editing')
-    this.mathliveDom.setValue(value || '')
-    const bounds = this.quill.getBounds(this.quill.selection.savedRange)
+    this.mathliveDom.value = value || ''
+    const range = this.quill.getSelection()
+    const bounds = range ? this.quill.getBounds(range) : null
     if (bounds != null) {
       this.position(bounds)
     }
